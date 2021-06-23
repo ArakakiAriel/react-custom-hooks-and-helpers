@@ -1,41 +1,44 @@
-import { useRef } from 'react';
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react';
 
-export const useFetch = (url) => {
+
+export const useFetch = ( url ) => {
     
-    const isMounted = useRef(true); //Con esta variable veremos si el componente sigue montado o no
-    const [state, setState] = useState({
-        data: null,
-        loading: true,
-        error: null
-    });
+    const isMounted = useRef(true);
+    const [state, setState] = useState({ data: null, loading: true, error: null });
 
-    useEffect(() => {
+    useEffect( () => {
         return () => {
-            isMounted.current = false; //En caso de que se desmonte el componente cambiamos el valor del useRef a false
+            isMounted.current = false;
         }
     }, [])
 
-    
-    useEffect(() => {
-        fetch(url)
-            .then(resp => resp.json())
-            .then(data => {
-                if (isMounted.current){ //Condicional que se fija si está o no montado, en caso de estarlo modifica el estado
+
+    useEffect( () => {
+
+        setState({ data: null, loading: true, error: null });
+
+        fetch( url )
+            .then( resp => resp.json() )
+            .then( data => {
+
+                if ( isMounted.current ) { //Conditional that check if the Component is mounted or not.
                     setState({
-                        loading:false,
-                        error:null,
+                        loading: false,
+                        error: null,
                         data
                     });
                 }
+
             })
-        return () => {
-            setState({
-                loading:true,
-                error:null,
+            .catch( (e) => {
+                setState({
+                    data: null,
+                    loading: false,
+                    error: 'Show some error'
+                })
             })
-        }
-    }, [url])
+
+    },[url])
 
     return state;
 }
